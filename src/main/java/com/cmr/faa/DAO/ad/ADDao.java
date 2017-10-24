@@ -1,33 +1,29 @@
 package com.cmr.faa.DAO.ad;
 
-import com.cmr.faa.App;
 import com.cmr.faa.model.excel.AD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ad" )
+@Table(name = "ad")
 public class ADDao {
     @Transient
     final static Logger log = LoggerFactory.getLogger(ADDao.class);
 
     @Transient
     private final AD ad;
+    @Transient
+    boolean urlValid = true;
+    @Transient
+    boolean pdfAttachement = false;
 
     @Transient
-    @Value("${adPdfBaseUrl:UnknownURL}")
-    private String baseUrl;
-
-
+    private String baseUrl = Constants.adPdfBaseUrl;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -68,54 +64,83 @@ public class ADDao {
         this.UNID = ad.getUNID();
         this.attachements = ad.getAttachements();
         this.extendedAttachmentURL = constructExtendedUrl(this.attachements);
-        checkAndLogExistence(extendedAttachmentURL);
     }
 
-    private void checkAndLogExistence(String extendedAttachmentURL) {
-        if (isUrlUnknown(extendedAttachmentURL))
-        {
+    public boolean checkAndLogExistence() {
+        boolean returnValue = false;
+        if (isUrlUnknown(extendedAttachmentURL)) {
             log.error("Base Airworthiness URL is unknown");
-            return;
-        }
-        try {
-            URL url = new URL(extendedAttachmentURL);
-            HttpURLConnection huc =  (HttpURLConnection)
-                    url.openConnection();
-            huc.setRequestMethod("HEAD");
-            huc.connect();
-            int responsecode= huc.getResponseCode();
-            if (responsecode != HttpURLConnection.HTTP_OK) {
-                log.warn("URL " + extendedAttachmentURL + " Did not return 'OK'.  AD: " + this.adNumber);
+        } else {
+            try {
+                URL url = new URL(extendedAttachmentURL);
+                HttpURLConnection huc = (HttpURLConnection)
+                        url.openConnection();
+                huc.setRequestMethod("HEAD");
+                huc.connect();
+                int responsecode = huc.getResponseCode();
+                if (responsecode != HttpURLConnection.HTTP_OK) {
+                    System.out.println();
+                    log.warn("URL " + extendedAttachmentURL + " Did not return 'OK'.  AD: " + this.adNumber + " returned " + responsecode);
+                } else {
+                    urlValid = true;
+                    returnValue = true;
+                }
+            } catch (MalformedURLException e) {
+                log.error("Extended Attachment URL is malformed! ");
+                e.printStackTrace();
+                return returnValue;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return returnValue;
             }
-        } catch (MalformedURLException e) {
-            log.error("Extended Attachment URL is malformed! ");
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        return returnValue;
     }
 
     private boolean isUrlUnknown(String extendedAttachmentURL) {
-        return (extendedAttachmentURL.contains("http://UnknownURL"));
+        return ((extendedAttachmentURL.contains("http://UnknownURL")) || (null == extendedAttachmentURL));
     }
 
     private String constructExtendedUrl(String attachements) {
         StringBuilder sb = new StringBuilder();
+        String pathFragment, urlString;
         if ((null == this.attachements) || (this.attachements.equals(""))) {
             //There is no pdf attachment, so set the extendedURL to the base AD page
-            sb.append(this.baseUrl)
+            sb.append("/")
                     .append(this.UNID)
-                    .append("?OpenDocument");
+                    .append("/?OpenDocument");
         } else {
-            sb.append(this.baseUrl)
+            sb.append("/")
                     .append(this.UNID)
-                    .append("$FILE")
+                    .append("/$FILE/")
                     .append(this.attachements);
+            pdfAttachement = true;
         }
         sb.trimToSize();
-        return sb.toString();
+        pathFragment = sb.toString();
+        try {
+            String path = Constants.AD_PATH + pathFragment;
+            URI uri = new URI(Constants.AD_BASE_SCHEME, Constants.AD_HOST, path);
+            URL url = uri.toURL();
+            urlString = url.toString();
+        } catch (URISyntaxException e) {
+            urlString = "";
+            e.printStackTrace();
+            urlValid = false;
+        } catch (MalformedURLException e) {
+            urlString = "";
+            e.printStackTrace();
+            urlValid = false;
+        }
+        return urlString;
+    }
+
+    public boolean isPdfAttachement() {
+        return pdfAttachement;
+    }
+
+    public boolean isUrlValid() {
+        return urlValid;
     }
 
 
