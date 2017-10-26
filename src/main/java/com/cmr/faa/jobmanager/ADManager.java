@@ -21,8 +21,8 @@ public class ADManager {
     private ADSpreadsheetDAO adSpreadsheetDAO;
     private List<AD> adList;
 
-    public void load() {
-        adList = adSpreadsheetDAO.load();
+    public void loadADsFromSpreadsheet(String AdSpreadSheetFileName) {
+        adList = adSpreadsheetDAO.load(AdSpreadSheetFileName);
         log.debug(adList.size() + " read from AD Spreadsheet.");
         log.info(adSpreadsheetDAO.toString());
         if (Constants.isCheckURLs()) {

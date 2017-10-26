@@ -2,16 +2,43 @@ package com.cmr.faa;
 
 public class AppArgs {
 
-
-    private boolean valid = false;
-
     private String[] arguments;
+
+    private boolean valid = true;
+    private boolean loadADs = false;
+    private boolean loadMakes = false;
+    private boolean loadModels = false;
 
     public AppArgs(String[] args) {
         this.arguments = args;
-        if (args.length == 0)
-            valid = true;
+        for (String arg :
+                args) {
+            if (!validArg(arg))
+                valid = false;
+        }
     }
+
+    private boolean validArg(String arg) {
+        boolean returnValue = true;
+        switch (arg.toLowerCase()) {
+            case "-ads":
+                loadADs = true;
+                break;
+            case "-makes":
+                loadMakes = true;
+                break;
+            case "-models":
+                loadModels = true;
+                break;
+            case "-all":
+                loadADs = loadMakes = loadModels = true;
+                break;
+            default:
+                returnValue = false;
+        }
+        return returnValue;
+    }
+
 
     public boolean isValid() {
         return valid;
@@ -26,8 +53,16 @@ public class AppArgs {
                 .append(lf)
                 .append("_____")
                 .append(lf)
-                .append("There is no set usage for arguments yet so any arguments provided are invalid.")
+                .append("The following are valid valid flags:")
                 .append(lf)
+                .append("-makes").append(lf)
+                .append("\t Loads the 'MAKES' excel spreadsheet").append(lf)
+                .append("-models").append(lf)
+                .append("\t Loads the 'MODELS' excel spreadsheet").append(lf)
+                .append("-ads").append(lf)
+                .append("\t Loads the Airworthiness Directives 'AD' excel spreadsheet").append(lf)
+                .append("-all").append(lf)
+                .append("\t Loads ALL the above spreadsheets").append(lf)
                 .append("Arguments Given")
                 .append(lf)
                 .append("---------------")
@@ -47,5 +82,17 @@ public class AppArgs {
         }
         sb.trimToSize();
         return (sb.toString());
+    }
+
+    public boolean isLoadADs() {
+        return loadADs;
+    }
+
+    public boolean isLoadMakes() {
+        return loadMakes;
+    }
+
+    public boolean isLoadModels() {
+        return loadModels;
     }
 }

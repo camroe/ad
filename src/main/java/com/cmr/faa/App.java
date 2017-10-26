@@ -5,6 +5,7 @@ import com.cmr.faa.jobmanager.ADManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,6 +17,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class App implements CommandLineRunner {
     final static Logger log = LoggerFactory.getLogger(App.class);
 
+    @Value("${AdSpreadSheetFileName:unknown}")
+    private String AdSpreadSheetFileName;
 
     @Autowired
     private IntroMessage introMessage;
@@ -41,7 +44,11 @@ public class App implements CommandLineRunner {
             introMessage.printBeans();
         loggerReport();
         //Real work here
-        adManager.load();//Main entry point to the load process.
+        if (appArgs.isValid()) {
+            if (appArgs.isLoadADs())
+                adManager.loadADsFromSpreadsheet(AdSpreadSheetFileName);
+
+        }
     }
 
     private void loggerReport() {

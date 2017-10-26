@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,18 +15,16 @@ import java.util.*;
 public class ADSpreadsheetDAO {
     final static Logger log = LoggerFactory.getLogger(ADSpreadsheetDAO.class);
 
-    @Value("${AdSpreadSheetFileName:unknown}")
-    private String AdSpreadSheetFileName;
     private int adcount, gliderCount, largeAirPlaneCount, smallAirplaneCount, ballonCount, rotorcraftCount, aircraftCount, engineCount, applianceCount, propellerCount, smallLargeAirplaneCount;
     private Set<String> productTypeSet = new HashSet<>();
     private Set<String> productSubTypeSet = new HashSet<>();
 
-    public List<AD> load() {
+    public List<AD> load(String adSpreadSheetFileName) {
         List<AD> adList = new ArrayList<>();
 
         //init counters
         adcount = gliderCount = largeAirPlaneCount = smallAirplaneCount = ballonCount = rotorcraftCount = aircraftCount = engineCount = applianceCount = propellerCount = smallLargeAirplaneCount = 0;
-        InputStream is = ADSpreadsheetDAO.class.getResourceAsStream(AdSpreadSheetFileName);
+        InputStream is = ADSpreadsheetDAO.class.getResourceAsStream(adSpreadSheetFileName);
         log.debug(String.valueOf(is));
         try {
             Workbook wb = new XSSFWorkbook(is);
@@ -79,13 +76,10 @@ public class ADSpreadsheetDAO {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        log.info(adcount + " lines read from " + AdSpreadSheetFileName);
+        log.info(adcount + " lines read from " + adSpreadSheetFileName);
         return adList;
     }
 
-    public String getAdSpreadSheetFileName() {
-        return AdSpreadSheetFileName;
-    }
 
     public int getAdcount() {
         return adcount;
