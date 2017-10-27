@@ -23,7 +23,7 @@ public class ADDao {
     boolean pdfAttachement = false;
 
     @Transient
-    private String baseUrl = Constants.adPdfBaseUrl;
+    private String baseUrl = ADConstants.adPdfBaseUrl;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -119,8 +119,8 @@ public class ADDao {
         sb.trimToSize();
         pathFragment = sb.toString();
         try {
-            String path = Constants.AD_PATH + pathFragment;
-            URI uri = new URI(Constants.AD_BASE_SCHEME, Constants.AD_HOST, path);
+            String path = ADConstants.AD_PATH + pathFragment;
+            URI uri = new URI(ADConstants.AD_BASE_SCHEME, ADConstants.AD_HOST, path);
             URL url = uri.toURL();
             urlString = url.toString();
         } catch (URISyntaxException e) {

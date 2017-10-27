@@ -2,6 +2,8 @@ package com.cmr.faa;
 
 
 import com.cmr.faa.jobmanager.ADManager;
+import com.cmr.faa.jobmanager.MakeManager;
+import com.cmr.faa.jobmanager.ModelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,24 @@ public class App implements CommandLineRunner {
     @Value("${AdSpreadSheetFileName:unknown}")
     private String AdSpreadSheetFileName;
 
+    @Value("${MakeSpreadSheetFileName:unknown}")
+    private String MakeSpreadSheetFileName;
+    @Value("${ModelSpreadSheetFileName:unknown}")
+    private String ModelSpreadSheetFileName;
+
+
+
     @Autowired
     private IntroMessage introMessage;
 
     @Autowired
     private ADManager adManager;
 
+    @Autowired
+    private MakeManager makeManager;
+
+    @Autowired
+    private ModelManager modelManager;
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(App.class);
         application.run(args);
@@ -47,7 +61,10 @@ public class App implements CommandLineRunner {
         if (appArgs.isValid()) {
             if (appArgs.isLoadADs())
                 adManager.loadADsFromSpreadsheet(AdSpreadSheetFileName);
-
+            if (appArgs.isLoadMakes())
+                makeManager.loadMakesFromSpreadsheet(MakeSpreadSheetFileName);
+            if (appArgs.isLoadModels())
+                modelManager.loadModelsFromSpreadsheet(ModelSpreadSheetFileName);
         }
     }
 

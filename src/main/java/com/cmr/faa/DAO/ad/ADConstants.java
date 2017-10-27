@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Constants {
+public class ADConstants {
 
 
     public static final String adPdfBaseUrl = "http://rgl.faa.gov/Regulatory_and_Guidance_Library/rgAD.nsf/0/";

@@ -1,4 +1,4 @@
-package com.cmr.faa.DAO.spreadsheet;
+package com.cmr.faa.DAO;
 
 public class Constants {
 
@@ -29,4 +29,10 @@ public class Constants {
     public static final int UNID_POS = 12;
     public static final int ATTACHMENTS_POS = 13;
 
+    public static final int MAKE_ID_POS = 0;
+    public static final int MAKE_MAKE_POS = 1;
+
+    public static final int MODEL_ID_POS = 0;
+    public static final int MODEL_MAKE_ID_POS = 1;
+    public static final int MODEL_NAME_POS = 2;
 }

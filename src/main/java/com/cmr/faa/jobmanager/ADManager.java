@@ -1,8 +1,8 @@
 package com.cmr.faa.jobmanager;
 
+import com.cmr.faa.DAO.ad.ADConstants;
 import com.cmr.faa.DAO.ad.ADDao;
-import com.cmr.faa.DAO.ad.Constants;
-import com.cmr.faa.DAO.spreadsheet.ADSpreadsheetDAO;
+import com.cmr.faa.DAO.ad.ADSpreadsheetDAO;
 import com.cmr.faa.model.excel.AD;
 import com.cmr.faa.repositories.AdRepository;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class ADManager {
         adList = adSpreadsheetDAO.load(AdSpreadSheetFileName);
         log.debug(adList.size() + " read from AD Spreadsheet.");
         log.info(adSpreadsheetDAO.toString());
-        if (Constants.isCheckURLs()) {
+        if (ADConstants.isCheckURLs()) {
             log.info("Checking URLS");
             printUrlReport(adList);
         }
