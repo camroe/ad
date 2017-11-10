@@ -9,4 +9,5 @@
     <include file="create_ad_table.xml" relativeToChangelogFile="true"/>
     <include file="create_makes_table.xml" relativeToChangelogFile="true"/>
     <include file="create_models_table.xml" relativeToChangelogFile="true"/>
+    <include file="create_model_to_ad_table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

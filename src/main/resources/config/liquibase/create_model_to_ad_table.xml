@@ -1,0 +1,19 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+
+    <changeSet author="Cam Roe" id="Create Model to AD Table">
+        <createTable tableName="model_ad" schemaName="ad">
+            <column name="id" type="Integer" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="model_id" type="Integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ad_id" type="Integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

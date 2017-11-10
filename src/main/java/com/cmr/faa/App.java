@@ -4,6 +4,7 @@ package com.cmr.faa;
 import com.cmr.faa.jobmanager.ADManager;
 import com.cmr.faa.jobmanager.MakeManager;
 import com.cmr.faa.jobmanager.ModelManager;
+import com.cmr.faa.jobmanager.ModelToADMappingManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,12 @@ public class App implements CommandLineRunner {
 
     @Value("${MakeSpreadSheetFileName:unknown}")
     private String MakeSpreadSheetFileName;
+
     @Value("${ModelSpreadSheetFileName:unknown}")
     private String ModelSpreadSheetFileName;
 
-
+    @Value("${AccessDatabaseFileName:unknown}")
+    private String AccessDatabaseFileName;
 
     @Autowired
     private IntroMessage introMessage;
@@ -40,6 +43,10 @@ public class App implements CommandLineRunner {
 
     @Autowired
     private ModelManager modelManager;
+
+    @Autowired
+    private ModelToADMappingManager modelToADMappingManager;
+
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(App.class);
         application.run(args);
@@ -65,6 +72,8 @@ public class App implements CommandLineRunner {
                 makeManager.loadMakesFromSpreadsheet(MakeSpreadSheetFileName);
             if (appArgs.isLoadModels())
                 modelManager.loadModelsFromSpreadsheet(ModelSpreadSheetFileName);
+            if (appArgs.isLoadMapping())
+                modelToADMappingManager.loadMapping(AccessDatabaseFileName);
         }
     }
 

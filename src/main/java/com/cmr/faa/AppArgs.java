@@ -8,6 +8,7 @@ public class AppArgs {
     private boolean loadADs = false;
     private boolean loadMakes = false;
     private boolean loadModels = false;
+    private boolean loadMapping = false;
 
     public AppArgs(String[] args) {
         this.arguments = args;
@@ -30,8 +31,11 @@ public class AppArgs {
             case "-models":
                 loadModels = true;
                 break;
+            case "-mapping":
+                loadMapping=true;
+                break;
             case "-all":
-                loadADs = loadMakes = loadModels = true;
+                loadADs = loadMakes = loadModels = loadMapping = true;
                 break;
             default:
                 returnValue = false;
@@ -55,12 +59,14 @@ public class AppArgs {
                 .append(lf)
                 .append("The following are valid valid flags:")
                 .append(lf)
+                .append("-ads").append(lf)
+                .append("\t Loads the Airworthiness Directives 'AD' excel spreadsheet").append(lf)
                 .append("-makes").append(lf)
                 .append("\t Loads the 'MAKES' excel spreadsheet").append(lf)
                 .append("-models").append(lf)
                 .append("\t Loads the 'MODELS' excel spreadsheet").append(lf)
-                .append("-ads").append(lf)
-                .append("\t Loads the Airworthiness Directives 'AD' excel spreadsheet").append(lf)
+                .append("-mapping").append(lf)
+                .append("\t Loads the Mapping of Models to ADs from the Access Database file (.accdb)").append(lf)
                 .append("-all").append(lf)
                 .append("\t Loads ALL the above spreadsheets").append(lf)
                 .append("Arguments Given")
@@ -94,5 +100,13 @@ public class AppArgs {
 
     public boolean isLoadModels() {
         return loadModels;
+    }
+
+    public boolean isLoadMapping() {
+        return loadMapping;
+    }
+
+    public void setLoadMapping(boolean loadMapping) {
+        this.loadMapping = loadMapping;
     }
 }
