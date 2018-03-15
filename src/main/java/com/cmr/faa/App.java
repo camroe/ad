@@ -29,6 +29,9 @@ public class App implements CommandLineRunner {
     @Value("${ModelSpreadSheetFileName:unknown}")
     private String ModelSpreadSheetFileName;
 
+    @Value("${ModelToADSpreadsheetFileName:unKnown}")
+    private String ModelToADSpreadsheetFileName;
+
     @Value("${AccessDatabaseFileName:unknown}")
     private String AccessDatabaseFileName;
 
@@ -59,22 +62,37 @@ public class App implements CommandLineRunner {
         System.out.println(introMessage.getApplicationName());
         System.out.println("----------------------------------------------------------------");
         AppArgs appArgs = new AppArgs(args);
-        if (!appArgs.isValid())
+        if (!appArgs.isValid()) {
             System.out.println(appArgs.usageMessage());
+            System.exit(1);
+        }
         if (introMessage.isDisplaySpringBeans())
             introMessage.printBeans();
         loggerReport();
         //Real work here
         if (appArgs.isValid()) {
-            if (appArgs.isLoadADs())
+            if ((appArgs.isLoadADs()) && (appArgs.isSpreadSheet()))
                 adManager.loadADsFromSpreadsheet(AdSpreadSheetFileName);
-            if (appArgs.isLoadMakes())
+            if ((appArgs.isLoadMakes()) && (appArgs.isSpreadSheet()))
                 makeManager.loadMakesFromSpreadsheet(MakeSpreadSheetFileName);
-            if (appArgs.isLoadModels())
+            if ((appArgs.isLoadModels()) && (appArgs.isSpreadSheet()))
                 modelManager.loadModelsFromSpreadsheet(ModelSpreadSheetFileName);
-            if (appArgs.isLoadMapping())
-                modelToADMappingManager.loadMapping(AccessDatabaseFileName);
+            if ((appArgs.isLoadMapping()) && (appArgs.isSpreadSheet()))
+                modelToADMappingManager.loadMappingFromSpreadsheet(ModelToADSpreadsheetFileName);
+
+            if ((appArgs.isDatabase()) && appArgs.isDescribe())
+                adManager.describeDatabase(AccessDatabaseFileName);
+
+            if ((appArgs.isLoadADs()) && (appArgs.isDatabase()))
+                adManager.loadADsFromAccessTable(AccessDatabaseFileName, appArgs);
+            if ((appArgs.isLoadMakes()) && (appArgs.isDatabase()))
+                makeManager.loadMakesFromAccessTable(AccessDatabaseFileName);
+            if ((appArgs.isLoadModels()) && (appArgs.isDatabase()))
+                modelManager.loadModelsFromAccess(AccessDatabaseFileName);
+            if ((appArgs.isLoadMapping()) && (appArgs.isDatabase()))
+                modelToADMappingManager.loadMappingFromAccess(AccessDatabaseFileName);
         }
+        System.exit(0);
     }
 
     private void loggerReport() {

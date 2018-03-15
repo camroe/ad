@@ -1,6 +1,6 @@
 package com.cmr.faa.DAO.Models;
 
-import com.cmr.faa.model.excel.Model;
+import com.cmr.faa.pojo.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

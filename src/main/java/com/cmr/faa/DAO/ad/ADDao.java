@@ -1,6 +1,6 @@
 package com.cmr.faa.DAO.ad;
 
-import com.cmr.faa.model.excel.AD;
+import com.cmr.faa.pojo.AD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public class ADDao {
     boolean pdfAttachement = false;
 
     @Transient
-    private String baseUrl = ADConstants.adPdfBaseUrl;
+    private String baseUrl = ADConstants.AD_PDF_BASE_URL;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -47,28 +47,29 @@ public class ADDao {
     private String attachements;
     private String extendedAttachmentURL;
 
-    public ADDao(AD excelAd) {
-        this.ad = excelAd;
-        this.ad_id = ad.getAd_id();
-        this.adNumber = ad.getAdNumber();
-        this.docketNumber = ad.getDocketNumber();
-        this.amendmentNumber = ad.getAmendmentNumber();
-        this.publishDate = ad.getPublishDate();
-        this.issueDate = ad.getIssueDate();
-        this.effectiveDate = ad.getEffectiveDate();
-        this.supersedes = ad.getSupersedes();
-        this.supersededBy = ad.getSupersededBy();
-        this.subject = ad.getSubject();
-        this.productType = ad.getProductType();
-        this.productSubtype = ad.getProductSubtype();
-        this.UNID = ad.getUNID();
-        this.attachements = ad.getAttachements();
+    public ADDao(AD ad) {
+        this.ad = ad;
+        this.ad_id = this.ad.getAd_id();
+        this.adNumber = this.ad.getAdNumber();
+        this.docketNumber = this.ad.getDocketNumber();
+        this.amendmentNumber = this.ad.getAmendmentNumber();
+        this.publishDate = this.ad.getPublishDate();
+        this.issueDate = this.ad.getIssueDate();
+        this.effectiveDate = this.ad.getEffectiveDate();
+        this.supersedes = this.ad.getSupersedes();
+        this.supersededBy = this.ad.getSupersededBy();
+        this.subject = this.ad.getSubject();
+        this.productType = this.ad.getProductType();
+        this.productSubtype = this.ad.getProductSubtype();
+        this.UNID = this.ad.getUNID();
+        this.attachements = this.ad.getAttachements();
         this.extendedAttachmentURL = constructExtendedUrl(this.attachements);
     }
 
-    public boolean checkAndLogExistence() {
+    public boolean validateExtendedURL() {
         boolean returnValue = false;
         if (isUrlUnknown(extendedAttachmentURL)) {
+            System.out.println();
             log.error("Base Airworthiness URL is unknown");
         } else {
             try {
@@ -80,16 +81,22 @@ public class ADDao {
                 int responsecode = huc.getResponseCode();
                 if (responsecode != HttpURLConnection.HTTP_OK) {
                     System.out.println();
-                    log.warn("URL " + extendedAttachmentURL + " Did not return 'OK'.  AD: " + this.adNumber + " returned " + responsecode);
+                    System.out.println("ADDao.validateExtendedURL");
+                    log.warn("URL (" + extendedAttachmentURL + ")\n Did not return 'OK'.  AD: " + this.adNumber + " returned " + responsecode);
+                    urlValid = false;
                 } else {
                     urlValid = true;
                     returnValue = true;
                 }
             } catch (MalformedURLException e) {
+                System.out.println();
+                System.out.println("ADDao.validateExtendedURL");
                 log.error("Extended Attachment URL is malformed! ");
                 e.printStackTrace();
                 return returnValue;
             } catch (IOException e) {
+                System.out.println();
+                System.out.println("ADDao.validateExtendedURL");
                 e.printStackTrace();
                 return returnValue;
             }
@@ -110,6 +117,7 @@ public class ADDao {
                     .append(this.UNID)
                     .append("/?OpenDocument");
         } else {
+            //There IS a pdf attachment
             sb.append("/")
                     .append(this.UNID)
                     .append("/$FILE/")
@@ -125,14 +133,22 @@ public class ADDao {
             urlString = url.toString();
         } catch (URISyntaxException e) {
             urlString = "";
+            printErrorMessage();
             e.printStackTrace();
             urlValid = false;
         } catch (MalformedURLException e) {
             urlString = "";
+            printErrorMessage();
             e.printStackTrace();
             urlValid = false;
         }
         return urlString;
+    }
+
+    private void printErrorMessage() {
+        System.out.println();
+        System.out.println("ADDao.constructExtendedUrl");
+        log.error("Error in constructing Extended URL for AD " + this.adNumber);
     }
 
     public boolean isPdfAttachement() {

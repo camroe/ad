@@ -1,6 +1,6 @@
 package com.cmr.faa.DAO.Mapping;
 
-import com.cmr.faa.model.access.ModelToAD;
+import com.cmr.faa.pojo.ModelToAD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public class ModelToADMappingDAO {
     private Integer ADID;
 
     public ModelToADMappingDAO(ModelToAD modelToAD) {
-        this.ADID=modelToAD.getAd_id();
+        this.ADID = modelToAD.getAd_id();
         this.model_id = modelToAD.getModel_id();
     }
 

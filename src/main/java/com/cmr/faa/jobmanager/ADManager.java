@@ -1,52 +1,87 @@
 package com.cmr.faa.jobmanager;
 
-import com.cmr.faa.DAO.ad.ADConstants;
+import com.cmr.faa.AppArgs;
+import com.cmr.faa.DAO.Constants;
 import com.cmr.faa.DAO.ad.ADDao;
-import com.cmr.faa.DAO.ad.ADSpreadsheetDAO;
-import com.cmr.faa.model.excel.AD;
+import com.cmr.faa.DAO.ad.ADDataLoader;
+import com.cmr.faa.pojo.AD;
 import com.cmr.faa.repositories.AdRepository;
+import com.healthmarketscience.jackcess.Database;
+import com.healthmarketscience.jackcess.DatabaseBuilder;
+import com.healthmarketscience.jackcess.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Component
-public class ADManager {
+public class ADManager extends Manager {
     final static Logger log = LoggerFactory.getLogger(ADManager.class);
+
     @Autowired
     AdRepository adRepository;
+
     @Autowired
-    private ADSpreadsheetDAO adSpreadsheetDAO;
+    private ADDataLoader adDataLoader;
+
+
     private List<AD> adList;
 
     public void loadADsFromSpreadsheet(String AdSpreadSheetFileName) {
-        adList = adSpreadsheetDAO.load(AdSpreadSheetFileName);
-        log.debug(adList.size() + " read from AD Spreadsheet.");
-        log.info(adSpreadsheetDAO.toString());
-        if (ADConstants.isCheckURLs()) {
-            log.info("Checking URLS");
-            printUrlReport(adList);
+        adList = adDataLoader.load(AdSpreadSheetFileName);
+        log.debug(adList.size() + " read from AD Data.");
+        log.info(adDataLoader.toString());
+        save();
+    }
+
+
+    public void loadADsFromAccessTable(String accessDatabaseFileName, AppArgs appArgs) {
+        Database db;
+        if (checkExistence(accessDatabaseFileName)) {
+            try {
+                db = DatabaseBuilder.open(new File(ADManager.class.getClassLoader().getResource(accessDatabaseFileName).getFile()));
+                Table adTable = db.getTable(Constants.ADs_TABLE_NAME);
+                adList = adDataLoader.load(adTable);
+                if (appArgs.isTestUrls())
+                    printUrlReport(adList);
+                log.debug(adList.size() + " read from AD Data.");
+                log.info(adDataLoader.toString());
+                save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
-        log.info("Saving ADs");
+    }
+
+    private void save() {
+        int saveCount = 0;
+        System.out.println();
         for (AD ad :
                 adList) {
             ADDao adDao = new ADDao(ad);
             adRepository.save(adDao);
+            saveCount++;
+            System.out.print("\r Saving: " + saveCount);
         }
+        System.out.println();
     }
-
 
     private void printUrlReport(List<AD> adList) {
         int adCount, validUrlAd, inValidUrlAd, noAttachements, pdfAttachments, noAttachmentsInvalid, pdfAttachementsInvalid;
         adCount = validUrlAd = inValidUrlAd = noAttachements = pdfAttachments = noAttachmentsInvalid = pdfAttachementsInvalid = 0;
-
+        System.out.println("------ V A L I D A T I N G  U R L S ---------");
         for (AD ad :
                 adList) {
             ADDao adDao = new ADDao(ad);
             adCount++;
             System.out.print("\r" + adCount + " of " + adList.size());
+            adDao.validateExtendedURL();
             if ((adDao.isPdfAttachement()) & (adDao.isUrlValid())) {
                 pdfAttachments++;
             } else if (adDao.isPdfAttachement()) {
@@ -63,7 +98,7 @@ public class ADManager {
                 validUrlAd++;
             else inValidUrlAd++;
         }
-
+        System.out.println();
         StringBuilder sb = new StringBuilder();
         String lf = "\n";
         sb.append(lf)
@@ -90,7 +125,11 @@ public class ADManager {
                 .append(lf);
         sb.trimToSize();
         log.info(sb.toString());
+        System.out.println("------ E N D  V A L I D A T I N G  U R L S ---------");
+
     }
 
 
 }
+
+
