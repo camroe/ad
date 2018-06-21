@@ -10,30 +10,30 @@ import java.util.Arrays;
 @Service
 public class IntroMessage {
 
-    @Value("${name:Unknown}")
-    private String applicationName;
+  @Value("${name:Unknown}")
+  private String applicationName;
 
-    @Value("${displayBeans:false}")
-    private String displayBeans;
+  @Value("${displayBeans:false}")
+  private String displayBeans;
 
-    @Autowired
-    private ApplicationContext applicationContext;
+  @Autowired
+  private ApplicationContext applicationContext;
 
-    public String getApplicationName() {
-        return applicationName;
+  public String getApplicationName() {
+    return applicationName;
+  }
+
+  public boolean isDisplaySpringBeans() {
+    return (displayBeans.equals("true"));
+  }
+
+  public void printBeans() {
+    String[] beans = applicationContext.getBeanDefinitionNames();
+    Arrays.sort(beans);
+    System.out.println("---------S P R I N G  B E A N S ---------------------------------");
+    for (String bean : beans) {
+      System.out.println(bean);
     }
-
-    public boolean isDisplaySpringBeans() {
-        return (displayBeans.equals("true"));
-    }
-
-    public void printBeans() {
-        String[] beans = applicationContext.getBeanDefinitionNames();
-        Arrays.sort(beans);
-        System.out.println("---------S P R I N G  B E A N S ---------------------------------");
-        for (String bean : beans) {
-            System.out.println(bean);
-        }
-        System.out.println("----------------------------------------------------------------");
-    }
+    System.out.println("----------------------------------------------------------------");
+  }
 }

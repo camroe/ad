@@ -18,89 +18,89 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class App implements CommandLineRunner {
-    final static Logger log = LoggerFactory.getLogger(App.class);
+  final static Logger log = LoggerFactory.getLogger(App.class);
 
-    @Value("${AdSpreadSheetFileName:unknown}")
-    private String AdSpreadSheetFileName;
+  @Value("${AdSpreadSheetFileName:unknown}")
+  private String AdSpreadSheetFileName;
 
-    @Value("${MakeSpreadSheetFileName:unknown}")
-    private String MakeSpreadSheetFileName;
+  @Value("${MakeSpreadSheetFileName:unknown}")
+  private String MakeSpreadSheetFileName;
 
-    @Value("${ModelSpreadSheetFileName:unknown}")
-    private String ModelSpreadSheetFileName;
+  @Value("${ModelSpreadSheetFileName:unknown}")
+  private String ModelSpreadSheetFileName;
 
-    @Value("${ModelToADSpreadsheetFileName:unKnown}")
-    private String ModelToADSpreadsheetFileName;
+  @Value("${ModelToADSpreadsheetFileName:unKnown}")
+  private String ModelToADSpreadsheetFileName;
 
-    @Value("${AccessDatabaseFileName:unknown}")
-    private String AccessDatabaseFileName;
+  @Value("${AccessDatabaseFileName:unknown}")
+  private String AccessDatabaseFileName;
 
-    @Autowired
-    private IntroMessage introMessage;
+  @Autowired
+  private IntroMessage introMessage;
 
-    @Autowired
-    private ADManager adManager;
+  @Autowired
+  private ADManager adManager;
 
-    @Autowired
-    private MakeManager makeManager;
+  @Autowired
+  private MakeManager makeManager;
 
-    @Autowired
-    private ModelManager modelManager;
+  @Autowired
+  private ModelManager modelManager;
 
-    @Autowired
-    private ModelToADMappingManager modelToADMappingManager;
+  @Autowired
+  private ModelToADMappingManager modelToADMappingManager;
 
-    public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(App.class);
-        application.run(args);
+  public static void main(String[] args) {
+    SpringApplication application = new SpringApplication(App.class);
+    application.run(args);
 
+  }
+
+  @Override
+  public void run(String... args) throws Exception {
+    System.out.println("----------------------------------------------------------------");
+    System.out.println(introMessage.getApplicationName());
+    System.out.println("----------------------------------------------------------------");
+    AppArgs appArgs = new AppArgs(args);
+    if (!appArgs.isValid()) {
+      System.out.println(appArgs.usageMessage());
+      System.exit(1);
     }
+    if (introMessage.isDisplaySpringBeans())
+      introMessage.printBeans();
+    loggerReport();
+    //Real work here
+    if (appArgs.isValid()) {
+      if ((appArgs.isLoadADs()) && (appArgs.isSpreadSheet()))
+        adManager.loadADsFromSpreadsheet(AdSpreadSheetFileName);
+      if ((appArgs.isLoadMakes()) && (appArgs.isSpreadSheet()))
+        makeManager.loadMakesFromSpreadsheet(MakeSpreadSheetFileName);
+      if ((appArgs.isLoadModels()) && (appArgs.isSpreadSheet()))
+        modelManager.loadModelsFromSpreadsheet(ModelSpreadSheetFileName);
+      if ((appArgs.isLoadMapping()) && (appArgs.isSpreadSheet()))
+        modelToADMappingManager.loadMappingFromSpreadsheet(ModelToADSpreadsheetFileName);
 
-    @Override
-    public void run(String... args) throws Exception {
-        System.out.println("----------------------------------------------------------------");
-        System.out.println(introMessage.getApplicationName());
-        System.out.println("----------------------------------------------------------------");
-        AppArgs appArgs = new AppArgs(args);
-        if (!appArgs.isValid()) {
-            System.out.println(appArgs.usageMessage());
-            System.exit(1);
-        }
-        if (introMessage.isDisplaySpringBeans())
-            introMessage.printBeans();
-        loggerReport();
-        //Real work here
-        if (appArgs.isValid()) {
-            if ((appArgs.isLoadADs()) && (appArgs.isSpreadSheet()))
-                adManager.loadADsFromSpreadsheet(AdSpreadSheetFileName);
-            if ((appArgs.isLoadMakes()) && (appArgs.isSpreadSheet()))
-                makeManager.loadMakesFromSpreadsheet(MakeSpreadSheetFileName);
-            if ((appArgs.isLoadModels()) && (appArgs.isSpreadSheet()))
-                modelManager.loadModelsFromSpreadsheet(ModelSpreadSheetFileName);
-            if ((appArgs.isLoadMapping()) && (appArgs.isSpreadSheet()))
-                modelToADMappingManager.loadMappingFromSpreadsheet(ModelToADSpreadsheetFileName);
+      if ((appArgs.isDatabase()) && appArgs.isDescribe())
+        adManager.describeDatabase(AccessDatabaseFileName);
 
-            if ((appArgs.isDatabase()) && appArgs.isDescribe())
-                adManager.describeDatabase(AccessDatabaseFileName);
-
-            if ((appArgs.isLoadADs()) && (appArgs.isDatabase()))
-                adManager.loadADsFromAccessTable(AccessDatabaseFileName, appArgs);
-            if ((appArgs.isLoadMakes()) && (appArgs.isDatabase()))
-                makeManager.loadMakesFromAccessTable(AccessDatabaseFileName);
-            if ((appArgs.isLoadModels()) && (appArgs.isDatabase()))
-                modelManager.loadModelsFromAccess(AccessDatabaseFileName);
-            if ((appArgs.isLoadMapping()) && (appArgs.isDatabase()))
-                modelToADMappingManager.loadMappingFromAccess(AccessDatabaseFileName);
-        }
-        System.exit(0);
+      if ((appArgs.isLoadADs()) && (appArgs.isDatabase()))
+        adManager.loadADsFromAccessTable(AccessDatabaseFileName, appArgs);
+      if ((appArgs.isLoadMakes()) && (appArgs.isDatabase()))
+        makeManager.loadMakesFromAccessTable(AccessDatabaseFileName);
+      if ((appArgs.isLoadModels()) && (appArgs.isDatabase()))
+        modelManager.loadModelsFromAccess(AccessDatabaseFileName);
+      if ((appArgs.isLoadMapping()) && (appArgs.isDatabase()))
+        modelToADMappingManager.loadMappingFromAccess(AccessDatabaseFileName);
     }
+    System.exit(0);
+  }
 
-    private void loggerReport() {
-        log.debug("Debug logging Enabled");
-        log.info("Info Logging Enabled");
-        log.warn("Warning Logging Enabled");
-        log.error("Error Logging Enabled");
-    }
+  private void loggerReport() {
+    log.debug("Debug logging Enabled");
+    log.info("Info Logging Enabled");
+    log.warn("Warning Logging Enabled");
+    log.error("Error Logging Enabled");
+  }
 
 
 }

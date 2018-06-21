@@ -13,11 +13,11 @@ import java.util.List;
 
 @Component
 public class ModelToADMappingDBDAO {
-    final static Logger log = LoggerFactory.getLogger(ModelToADMappingDBDAO.class);
+  final static Logger log = LoggerFactory.getLogger(ModelToADMappingDBDAO.class);
 
-    public List<ModelToAD> load(String modelToADSpreadsheetFileName) {
-        List<ModelToAD> modelToADList = new ArrayList<>();
-        InputStream is = MakesDataLoader.class.getResourceAsStream(modelToADSpreadsheetFileName);
-        return Collections.emptyList();
-    }
+  public List<ModelToAD> load(String modelToADSpreadsheetFileName) {
+    List<ModelToAD> modelToADList = new ArrayList<>();
+    InputStream is = MakesDataLoader.class.getResourceAsStream(modelToADSpreadsheetFileName);
+    return Collections.emptyList();
+  }
 }

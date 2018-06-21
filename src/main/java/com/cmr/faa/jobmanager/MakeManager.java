@@ -19,46 +19,46 @@ import java.util.List;
 
 @Component
 public class MakeManager extends Manager {
-    final static Logger log = LoggerFactory.getLogger(MakeManager.class);
+  final static Logger log = LoggerFactory.getLogger(MakeManager.class);
 
-    @Autowired
-    MakeRepository makeRepository;
+  @Autowired
+  MakeRepository makeRepository;
 
-    @Autowired
-    private MakesDataLoader makesDataLoader;
-    private List<Make> makeList;
+  @Autowired
+  private MakesDataLoader makesDataLoader;
+  private List<Make> makeList;
 
-    public void loadMakesFromSpreadsheet(String makeSpreadSheetFilename) {
-        makeList = makesDataLoader.loadSpreadSheet(makeSpreadSheetFilename);
-        log.debug(makeList.size() + " Read from Makes Spreadsheet");
+  public void loadMakesFromSpreadsheet(String makeSpreadSheetFilename) {
+    makeList = makesDataLoader.loadSpreadSheet(makeSpreadSheetFilename);
+    log.debug(makeList.size() + " Read from Makes Spreadsheet");
+    save();
+  }
+
+  private void save() {
+    System.out.println();
+    int saveCount = 0;
+    for (Make make :
+        makeList) {
+      MakeDao makeDao = new MakeDao(make);
+      makeRepository.save(makeDao);
+      saveCount++;
+      System.out.print("\r Saving: " + saveCount);
+    }
+    System.out.println();
+  }
+
+  public void loadMakesFromAccessTable(String accessDatabaseFileName) {
+    Database db;
+    if (checkExistence(accessDatabaseFileName)) {
+      try {
+        db = DatabaseBuilder.open(new File(MakeManager.class.getClassLoader().getResource(accessDatabaseFileName).getFile()));
+        Table makesTable = db.getTable(Constants.MAKES_TABLE_NAME);
+        makeList = makesDataLoader.load(makesTable);
+        log.debug(makeList.size() + " read from Makes Data.");
         save();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
-
-    private void save() {
-        System.out.println();
-        int saveCount = 0;
-        for (Make make :
-                makeList) {
-            MakeDao makeDao = new MakeDao(make);
-            makeRepository.save(makeDao);
-            saveCount++;
-            System.out.print("\r Saving: " + saveCount);
-        }
-        System.out.println();
-    }
-
-    public void loadMakesFromAccessTable(String accessDatabaseFileName) {
-        Database db;
-        if (checkExistence(accessDatabaseFileName)) {
-            try {
-                db = DatabaseBuilder.open(new File(MakeManager.class.getClassLoader().getResource(accessDatabaseFileName).getFile()));
-                Table makesTable = db.getTable(Constants.MAKES_TABLE_NAME);
-                makeList = makesDataLoader.load(makesTable);
-                log.debug(makeList.size() + " read from Makes Data.");
-                save();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+  }
 }

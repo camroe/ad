@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface AdRepository extends Repository<ADDao, Integer> {
 
-    List<ADDao> findAll();
+  List<ADDao> findAll();
 
-    ADDao findByAdNumber(String adnumber);
+  ADDao findByAdNumber(String adnumber);
 
-    ADDao save(ADDao adToPersist);
+  ADDao save(ADDao adToPersist);
 
 }
 

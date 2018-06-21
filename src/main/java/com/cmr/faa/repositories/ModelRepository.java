@@ -5,6 +5,6 @@ import org.springframework.data.repository.Repository;
 
 public interface ModelRepository extends Repository<ModelDao, Integer> {
 
-    ModelDao save(ModelDao adToPersist);
+  ModelDao save(ModelDao adToPersist);
 
 }
