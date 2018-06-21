@@ -111,11 +111,12 @@ public class ADDao {
     private String constructExtendedUrl(String attachements) {
         StringBuilder sb = new StringBuilder();
         String pathFragment, urlString;
+        boolean opendocument = false;
         if ((null == this.attachements) || (this.attachements.equals(""))) {
             //There is no pdf attachment, so set the extendedURL to the base AD page
             sb.append("/")
-                    .append(this.UNID)
-                    .append("/?OpenDocument");
+                    .append(this.UNID);
+            opendocument = true;
         } else {
             //There IS a pdf attachment
             sb.append("/")
@@ -128,9 +129,14 @@ public class ADDao {
         pathFragment = sb.toString();
         try {
             String path = ADConstants.AD_PATH + pathFragment;
-            URI uri = new URI(ADConstants.AD_BASE_SCHEME, ADConstants.AD_HOST, path);
+            URI uri;
+            if (opendocument)
+                uri = new URI(ADConstants.AD_BASE_SCHEME, null, ADConstants.AD_HOST, "?OpenDocument", null);
+            else
+                uri = new URI(ADConstants.AD_BASE_SCHEME, ADConstants.AD_HOST, path, "");
             URL url = uri.toURL();
             urlString = url.toString();
+            log.info(urlString);
         } catch (URISyntaxException e) {
             urlString = "";
             printErrorMessage();

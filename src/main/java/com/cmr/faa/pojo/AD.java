@@ -107,6 +107,8 @@ public class AD {
     }
 
     public void setProductType(String productType) {
+        if (null == productType)
+            productType = "";
         this.productType = productType;
     }
 
@@ -115,6 +117,8 @@ public class AD {
     }
 
     public void setProductSubtype(String productSubtype) {
+        if (null == productSubtype)
+            productSubtype = "";
         this.productSubtype = productSubtype;
     }
 

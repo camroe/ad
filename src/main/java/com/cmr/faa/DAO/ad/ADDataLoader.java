@@ -21,15 +21,17 @@ public class ADDataLoader {
     private Set<String> productTypeSet = new HashSet<>();
     private Set<String> productSubTypeSet = new HashSet<>();
 
+    /**
+     * Loads the Airworthiness directives from an Access database
+     *
+     * @param adTable Access Database Table name to load from
+     * @return List<AD> List of Airworthiness Directives as found in the access database.
+     */
     public List<AD> load(Table adTable) {
         List<AD> adList = new ArrayList<>();
         initCounters();
-//        try {
-//            adTable.getNextRow();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        System.out.println("----B E G I N  L  O A D -----------");
+
+        System.out.println("----B E G I N  L  O A D  O F  ADs  F R O M  A C C E S S  D A T A B A S E -----------");
         for (com.healthmarketscience.jackcess.Row row :
                 adTable) {
             adcount++;
@@ -46,8 +48,10 @@ public class ADDataLoader {
             ad.setSupersededBy(row.getString(Constants.SUPERSEDED_BY_COLUMN_NAME));
             ad.setSubject(row.getString(Constants.SUBJECT_COLUMN_NAME));
             ad.setProductType(row.getString(Constants.PRODUCT_TYPE_COLUMN_NAME));
+            checkAndApplySpecialRulesProductType(ad);
             adjustProductTypeCounts(ad);
             ad.setProductSubtype(row.getString(Constants.PRODUCT_SUBTYPE_COLUMN_NAME));
+            checkAndApplySpecialRulesProductSubType(ad);
             adjustProductSubTypeCounts(ad);
             ad.setUNID(row.getString(Constants.UNID_COLUMN_NAME));
             ad.setAttachements(row.getString(Constants.ATTACHMENTS_COLUMN_NAME));
@@ -102,9 +106,11 @@ public class ADDataLoader {
                 ad.setSubject(cell.getStringCellValue());
                 cell = currentRow.getCell(Constants.PRODUCT_TYPE_POS);
                 ad.setProductType(cell.getStringCellValue());
+                checkAndApplySpecialRulesProductType(ad);
                 adjustProductTypeCounts(ad);
                 cell = currentRow.getCell(Constants.PRODUCT_SUBTYPE_POS);
                 ad.setProductSubtype(cell.getStringCellValue());
+                checkAndApplySpecialRulesProductSubType(ad);
                 adjustProductSubTypeCounts(ad);
                 cell = currentRow.getCell(Constants.UNID_POS);
                 ad.setUNID(cell.getStringCellValue());
@@ -238,13 +244,7 @@ public class ADDataLoader {
 
     private void adjustProductTypeCounts(AD ad) {
         String productType = ad.getProductType();
-        if ((null == productType) || (productType.equals(""))) {
-            System.out.println();
-            log.warn("BLANK product type in spreadsheet. AD_ID => " + ad.getAd_id()
-                    + "  AD=> "
-                    + ad.getAdNumber());
-            productType = applySpecialRulesProductType(ad);
-        }
+
         if (productType.equals(Constants.PRODUCT_TYPE_AIRCRAFT))
             aircraftCount++;
         if (productType.equals(Constants.PRODUCT_TYPE_APPLIANCE))
@@ -254,7 +254,7 @@ public class ADDataLoader {
         if (productType.equals(Constants.PRODUCT_TYPE_PROPELLER))
             propellerCount++;
 
-        if (!productType.equals(""))
+        if ((!productType.equals("")) && (null != productType))
             productTypeSet.add(productType);
     }
 
@@ -262,18 +262,8 @@ public class ADDataLoader {
     private void adjustProductSubTypeCounts(AD ad) {
         String productType = ad.getProductType();
         String productSubType = ad.getProductSubtype();
-        if ((null == productType) || (productType.equals("")))
-            return;
-
-        if (productType.equals(Constants.PRODUCT_TYPE_AIRCRAFT)) {
-
-            if ((null == productSubType) || (productSubType.equals(""))) {
-                System.out.println();
-                log.warn("For AD: \n" + ad.getAdNumber() + "\nBLANK product SUB_type in spreadsheet. AD_ID => " + ad.getAd_id()
-                        + "  AD=> "
-                        + ad.getAdNumber());
-                productSubType = applySpecialRulesProductSubType(ad);
-            }
+        //All Product Type 'Aircraft' should have a subtype
+        if (ad.getProductType().equals(Constants.PRODUCT_TYPE_AIRCRAFT)) {
             if (productSubType.equals(Constants.PRODUCT_SUBTYPE_GLIDER))
                 gliderCount++;
             if (productSubType.equals(Constants.PRODUCT_SUBTYPE_LARGE_AIRPLANE))
@@ -286,12 +276,22 @@ public class ADDataLoader {
                 smallLargeAirplaneCount++;
             if (productSubType.equals(Constants.PRODUCT_SUBTYPE_BALLOON))
                 ballonCount++;
-            productSubTypeSet.add(productSubType);
+            if (productSubType.equals("")) {
+                System.out.println();
+                log.warn("Unexpected  Blank Subtype found. AD_ID => " + ad.getAd_id()
+                        + "  AD=> "
+                        + ad.getAdNumber()
+                        + "  ProductType => '"
+                        + ad.getProductType() + "'"
+                        + "  ProductSubType => '"
+                        + productSubType + "'");
+            } else
+                productSubTypeSet.add(productSubType);
+            //Other product types 'could' have a subtype.
         } else if ((productType.equals(Constants.PRODUCT_TYPE_ENGINE))
                 || (productType.equals(Constants.PRODUCT_TYPE_PROPELLER))
                 || (productType.equals(Constants.PRODUCT_TYPE_APPLIANCE))) {
-            //Engine,Propeller are inconsistent in their application of Subtypes
-            if ((null == productSubType) || (productSubType.equals(""))) {
+            if ((null == productSubType)) {
                 productSubType = "";
             }
             if (productSubType.equals(Constants.PRODUCT_SUBTYPE_GLIDER))
@@ -310,60 +310,75 @@ public class ADDataLoader {
                 productSubTypeSet.add(productSubType);
 
 
-        } else {
+        }
+    }
+
+    private void checkAndApplySpecialRulesProductType(AD ad) {
+
+        if ((null == ad.getProductType()) || (ad.getProductType().equals(""))) {
             System.out.println();
-            log.warn("Unexpected Subtype found. AD_ID => " + ad.getAd_id()
+            log.warn("BLANK product type in spreadsheet. AD_ID => " + ad.getAd_id()
                     + "  AD=> "
                     + ad.getAdNumber()
-                    + "  ProductSubType => "
-                    + productSubType);
+                    + ". Applying special known rules to solve blank product type in AD.");
+            if ((ad.getAdNumber().equals("2002-14-51"))
+                    || (ad.getAdNumber().equals("2010-25-51"))) {
+                log.warn("SPECIAL RULE APPLIED For AD: \n" + ad.getAdNumber() + "\nProduct Type changed to " + Constants.PRODUCT_TYPE_AIRCRAFT
+                        + " from <" + ad.getProductType() + ">");
+                ad.setProductType(Constants.PRODUCT_TYPE_AIRCRAFT);
+                System.out.println();
+            }
+            //Superseded by AD 91-04-02 which was an Engine Product type.
+            if ((ad.getAdNumber().equals("90-21-01"))) {
+                log.warn("SPECIAL RULE APPLIED For AD: \n" + ad.getAdNumber() + "\nProduct Type Changed to " + Constants.PRODUCT_TYPE_ENGINE
+                        + " from <" + ad.getProductType() + ">");
+                ad.setProductType(Constants.PRODUCT_TYPE_ENGINE);
+                System.out.println();
+            }
+        }
+        //Recheck for null and emit error if still null or blank.
+        if ((null == ad.getProductType() || (ad.getProductType().equals("")))) {
+            System.out.println();
+            log.error("For AD: \n" + ad.getAdNumber() + "\nProduct type Blank - no change");
         }
     }
 
-    private String applySpecialRulesProductType(AD ad) {
+    private void checkAndApplySpecialRulesProductSubType(AD ad) {
+        String productSubType = ad.getProductSubtype();
+        if ((null == ad.getProductType()) || (ad.getProductType().equals("")))
+            log.error("Can not apply any special rules for subtype to blank or null product type."
+            + " AD => "
+            + ad.getAdNumber());
+        else if (ad.getProductType().equals(Constants.PRODUCT_TYPE_AIRCRAFT)) {
+            if ((null == productSubType) || (productSubType.equals(""))) {
+                System.out.println();
+                log.warn("For AD: \n" + ad.getAdNumber() + "\nBLANK product SUB_TYPE. AD_ID => " + ad.getAd_id()
+                        + "  AD=> "
+                        + ad.getAdNumber()
+                        + ". Applying special known rules to solve blank product sub_type in AD.");
 
-        if ((ad.getAdNumber().equals("2002-14-51"))
-                || (ad.getAdNumber().equals("2010-25-51"))) {
-            log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Type changed to " + Constants.PRODUCT_TYPE_AIRCRAFT
-                    + " from <" + ad.getProductType() + ">");
-            ad.setProductType(Constants.PRODUCT_TYPE_AIRCRAFT);
-            System.out.println();
-            return Constants.PRODUCT_TYPE_AIRCRAFT;
-        }
-        //Superseded by AD 91-04-02 which was an Engine Product type.
-        if ((ad.getAdNumber().equals("90-21-01"))) {
-            log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Type Changed to " + Constants.PRODUCT_TYPE_ENGINE
-                    + " from <" + ad.getProductType() + ">");
-            ad.setProductType(Constants.PRODUCT_TYPE_ENGINE);
-            System.out.println();
-            return Constants.PRODUCT_TYPE_ENGINE;
-        }
-        System.out.println();
-        log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct type Blank - no change");
-        return "";
-    }
+            }
+                //Main Rotor blades Ad
+                if ((ad.getAdNumber().equals("2002-14-51"))
+                        || (ad.getAdNumber().equals("2010-25-51"))) {
+                    log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Sub-Type changed to " + Constants.PRODUCT_SUBTYPE_ROTOCRAFT
+                            + " from <" + ad.getProductSubtype() + ">");
+                    ad.setProductSubtype(Constants.PRODUCT_SUBTYPE_ROTOCRAFT);
+                    System.out.println();
+                }
+                //Airbus wings Ad.
+                if (ad.getAdNumber().equals("2014-14-05")) {
+                    log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Sub-Type changed to " + Constants.PRODUCT_SUBTYPE_LARGE_AIRPLANE
+                            + " from <" + ad.getProductSubtype() + ">");
+                    ad.setProductSubtype(Constants.PRODUCT_SUBTYPE_LARGE_AIRPLANE);
+                    System.out.println();
+                }
+                //Recheck for null and emit error if still null or blank.
+                if ((null == ad.getProductSubtype()) || (ad.getProductSubtype().equals(""))) {
+                    log.error("For AD: \n" + ad.getAdNumber() + "\nProduct Sub Type Blank - no change");
+                }
 
-    private String applySpecialRulesProductSubType(AD ad) {
-        //Main Rotor blades Ad
-        if ((ad.getAdNumber().equals("2002-14-51"))
-                || (ad.getAdNumber().equals("2010-25-51"))) {
-            log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Sub-Type changed to " + Constants.PRODUCT_SUBTYPE_ROTOCRAFT
-                    + " from <" + ad.getProductSubtype() + ">");
-            ad.setProductSubtype(Constants.PRODUCT_SUBTYPE_ROTOCRAFT);
-            System.out.println();
-            return Constants.PRODUCT_SUBTYPE_ROTOCRAFT;
         }
-        //Airbus wings Ad.
-        if (ad.getAdNumber().equals("2014-14-05")) {
-            log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Sub-Type changed to " + Constants.PRODUCT_SUBTYPE_LARGE_AIRPLANE
-                    + " from <" + ad.getProductSubtype() + ">");
-            ad.setProductSubtype(Constants.PRODUCT_SUBTYPE_LARGE_AIRPLANE);
-            System.out.println();
-            return Constants.PRODUCT_SUBTYPE_LARGE_AIRPLANE;
-        }
-        System.out.println();
-        log.warn("For AD: \n" + ad.getAdNumber() + "\nProduct Sub Type Blank - no change");
-        return "";
     }
 
 
