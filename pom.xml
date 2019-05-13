@@ -45,11 +45,7 @@
             <artifactId>jsoup</artifactId>
             <version>1.8.3</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.17</version>
-        </dependency>
+
         <!--LOGBACK-->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -65,11 +61,6 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.1.4</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess -->
         <dependency>
             <groupId>com.healthmarketscience.jackcess</groupId>
@@ -77,6 +68,11 @@
             <version>2.1.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.cmr.faa</groupId>
+            <artifactId>data</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
