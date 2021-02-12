@@ -1,113 +1,161 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.cmr.faa</groupId>
-    <artifactId>adadmin</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>adadmin</name>
-    <url>http://maven.apache.org</url>
-    <parent>
+  <groupId>com.cmr.faa</groupId>
+  <artifactId>adadmin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>adadmin</name>
+  <url>http://maven.apache.org</url>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.0.0.RELEASE</version>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+    <spring.boot>2.0.0</spring.boot>
+  </properties>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.junit.vintage</groupId>-->
+<!--      <artifactId>junit-vintage-engine</artifactId>-->
+<!--    </dependency>-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.9</version>
+    </dependency>
+
+    <!--LOGBACK-->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+    </dependency>
+    <!-- DATABASE DRIVER -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess -->
+    <dependency>
+      <groupId>com.healthmarketscience.jackcess</groupId>
+      <artifactId>jackcess</artifactId>
+      <version>2.1.2</version>
+    </dependency>
+
+    <!--        <dependency>-->
+    <!--            <groupId>com.cmr.faa</groupId>-->
+    <!--            <artifactId>common-data</artifactId>-->
+    <!--          <scope>system</scope>-->
+    <!--          <systemPath>/Users/croe10/working/airworthiness-directives/ad_common_data/target/common-data-1.0-SNAPSHOT.jar</systemPath>-->
+    <!--        </dependency>-->
+
+
+    <!-- EXCEL SPREADSHEETS -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>3.17</version>
+    </dependency>
+    <!-- TESTING -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.5.0-M1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <version>1.5.0-M1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.5.0-M1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+  <build>
+    <plugins>
+      <plugin>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.0.RELEASE</version>
-    </parent>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <spring.boot>2.0.0</spring.boot>
-    </properties>
-
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.8.3</version>
-        </dependency>
-
-        <!--LOGBACK-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-        </dependency>
-        <!-- DATABASE DRIVER -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess -->
-        <dependency>
-            <groupId>com.healthmarketscience.jackcess</groupId>
-            <artifactId>jackcess</artifactId>
-            <version>2.1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.cmr.faa</groupId>
-            <artifactId>common-data</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-    </dependencies>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.5.3</version>
-                <configuration>
-                    <propertyFile>src/main/resources/config/liquibase/liquibase.properties</propertyFile>
-                    <changeLogFile>src/main/resources/config/liquibase/changelog-master.xml</changeLogFile>
-                    <driver>org.postgresql.Driver</driver>
-                    <username>ad</username>
-                    <password>I82frogs</password>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>update</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-maven-plugin</artifactId>
+        <version>3.5.3</version>
+        <configuration>
+          <propertyFile>src/main/resources/config/liquibase/liquibase.properties</propertyFile>
+          <changeLogFile>src/main/resources/config/liquibase/changelog-master.xml</changeLogFile>
+          <driver>org.postgresql.Driver</driver>
+          <username>ad</username>
+          <password>I82frogs</password>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>update</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 
 </project>
